@@ -204,17 +204,25 @@ void LiquidCrystal_SR::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
    // 50
    // ---------------------------------------------------------------------------
    delayMicroseconds(50000);
-   init4bits(LCD_FUNCTIONSET | LCD_8BITMODE);
+   // The spec sheet says to send 0x03 0x03 0x03 0x02
+   // The code below seems to send 0x30 0x30 0x30 0x20, but due to weird wiring
+   // and write4bits bit shifting, 0x30 becomes 0x30 >> 1 = 0x18
+   // 0x18 in turn is mapped to pins D4 and D5 of the LCD, which sees the 
+   // command as 0x03, this is confusing as hell -- merlin
+   // http://code.google.com/p/arduinoshiftreglcd/  (for pin mapping).
+   // It kind of works by luck here, other 4bit designs do require to have
+   /// 0x03 sent and not 0x30.
+   write4bits(LCD_FUNCTIONSET | LCD_8BITMODE);
    delayMicroseconds(4500);  // wait more than 4.1ms
    
    // Second try
-   init4bits(LCD_FUNCTIONSET | LCD_8BITMODE);
+   write4bits(LCD_FUNCTIONSET | LCD_8BITMODE);
    delayMicroseconds(150);
    // Third go
-   init4bits(LCD_FUNCTIONSET | LCD_8BITMODE);
+   write4bits(LCD_FUNCTIONSET | LCD_8BITMODE);
    
    // And finally, set to 4-bit interface
-   init4bits(LCD_FUNCTIONSET | LCD_4BITMODE);
+   write4bits(LCD_FUNCTIONSET | LCD_4BITMODE);
    
    // Set # lines, font size, etc.
    command(LCD_FUNCTIONSET | _displayfunction);
@@ -250,6 +258,10 @@ void LiquidCrystal_SR::send(uint8_t value, uint8_t mode)
    val1 = mode | SR_EN_BIT | ((value >> 1) & 0x78); // upper nibble
    val2 = mode | SR_EN_BIT | ((value << 3) & 0x78); // lower nibble
    
+   // FIXME: buggy, in 3 wire mode you can't just send the data with the 
+   // SR_EN_BIT bit set. SR_EN_BIT needs to be toggled on and off.
+   // This just happens to work in 2 wire mode since the command above clears
+   // all bits.
    shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, val1 );
    
    digitalWrite( _enable_pin, HIGH );
@@ -262,6 +274,10 @@ void LiquidCrystal_SR::send(uint8_t value, uint8_t mode)
    {
       shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, 0x00 ); 
    }
+   // FIXME: buggy, in 3 wire mode you can't just send the data with the 
+   // SR_EN_BIT bit set. SR_EN_BIT needs to be toggled on and off.
+   // This just happens to work in 2 wire mode since the command above clears
+   // all bits.
    shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, val2 );
    
    digitalWrite( _enable_pin, HIGH );
@@ -271,8 +287,8 @@ void LiquidCrystal_SR::send(uint8_t value, uint8_t mode)
 }
 
 //
-// init4bits
-void LiquidCrystal_SR::init4bits(uint8_t value) 
+// write4bits
+void LiquidCrystal_SR::write4bits(uint8_t value) 
 {
    uint8_t val1;
    
@@ -284,6 +300,8 @@ void LiquidCrystal_SR::init4bits(uint8_t value)
    }
    digitalWrite( _enable_pin, LOW );
    
+   // FIXME: this is likely buggy in the 3 wire scenario since
+   // SR_EN_BIT is apparently not toggled on and off in 3 write mode.
    val1 = SR_EN_BIT | ((value >> 1) & 0x78);
    shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, val1 );
    
