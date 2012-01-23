@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+Originally Created by Francisco Malpartida on 2011/08/20.
+Copyright 2011 - Under creative commons license 3.0:
+       Attribution-ShareAlike CC BY-SA
+
+This software is furnished "as is", without technical support, and with no 
+warranty, express or implied, as to its usefulness for any purpose.
+
+This source comes from
+https://github.com/marcmerlin/NewLiquidCrystal
+
+Francisco gets all the credit for doing the original work of making a modular
+LiquidDisplay library. This code was forked off Francisco's code:
+http://hg.bijland.net/fmalpartida/new-liquidcrystal
+https://bitbucket.org/fmalpartida/new-liquidcrystal/wiki/Home
+
+In turn, Raron used Francisco's code and made this shift register library:
+http://code.google.com/p/arduinoshiftreglcd/
+
+This is where I came in, by writing LiquidCrystal_SR_LCD3, was forked off
+LiquidCrystal_SR which unfortunately does not use the same wiring.
+I targetted the code for the Pebble and Pebblev2 (just released by freetronics
+in the arduino miniconf as part of linux.conf.au 2012) and therefore this code
+organizes the output data differently.
+
+Pinout for this code is used by all derivatives of the original LCD3Wire page:
+http://www.arduino.cc/playground/Code/LCD3wires
+
+This includes the LCA (linux.conf.au) Arduino Miniconf Pebble: 
+http://shieldlist.org/luke-weston/pebble
+https://github.com/lukeweston/Pebble
+
+It also includes the Pebble v2:
+http://www.arduinominiconf.org/index.php/Pebble_V2.0_Instructions
+http://www.freetronics.com/pages/pebble-v2
+https://github.com/lukeweston/pebble20/blob/master/README.md
+https://github.com/lukeweston/pebble20/blob/master/pebble-sch.pdf
+
+Pebbles and the LCD3Wires design are compatible hardware-wise, but
+the LCD3Wire code does not work with arduino 1.0 anymore and is generally
+quite limited in functionality compared to this framework that provides the
+entire LiquidDisplay functionality.
+
+Why write LiquidCrystal_SR_LCD3 and not just use the LiquidCrystal_SR pinout?
+- LCD3Wire was first and therefore have hardware that was designed with 
+  incompatible (IMO better if you don't mind 3 wires) pinout.
+- The pinout used here is same saner (the 4 bits for the LCD are all in one 
+  nibble of the shift register, not spread across 2 like in the
+  LiquidCrystal_SR pinout)
+ 
+This code makes sure to properly follow the specifications when talking
+to the LCD while using minimal delays (it's faster than the LCD3wire and aiko
+pebble code).
+
