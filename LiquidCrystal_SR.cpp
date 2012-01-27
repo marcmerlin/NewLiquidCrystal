@@ -258,10 +258,11 @@ void LiquidCrystal_SR::send(uint8_t value, uint8_t mode)
    val1 = mode | SR_EN_BIT | ((value >> 1) & 0x78); // upper nibble
    val2 = mode | SR_EN_BIT | ((value << 3) & 0x78); // lower nibble
    
-   // FIXME: buggy, in 3 wire mode you can't just send the data with the 
-   // SR_EN_BIT bit set. SR_EN_BIT needs to be toggled on and off.
-   // This just happens to work in 2 wire mode since the command above clears
-   // all bits.
+   // Note: it looks like the code is buggy and does not send a SR_EN_BIT
+   // low to high transition. However due to the peculiar wiring required by this
+   // code, toggling the SR _enable_pin low happens to also take the LCD enable bit
+   // low and therefore creates the low/high transition required by the LCD.
+   // Not obvious from reading the code, but it works :)
    shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, val1 );
    
    digitalWrite( _enable_pin, HIGH );
@@ -274,10 +275,7 @@ void LiquidCrystal_SR::send(uint8_t value, uint8_t mode)
    {
       shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, 0x00 ); 
    }
-   // FIXME: buggy, in 3 wire mode you can't just send the data with the 
-   // SR_EN_BIT bit set. SR_EN_BIT needs to be toggled on and off.
-   // This just happens to work in 2 wire mode since the command above clears
-   // all bits.
+   // See comment above on the low/high transition for SR_EN_BIT.
    shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, val2 );
    
    digitalWrite( _enable_pin, HIGH );
@@ -300,8 +298,11 @@ void LiquidCrystal_SR::write4bits(uint8_t value)
    }
    digitalWrite( _enable_pin, LOW );
    
-   // FIXME: this is likely buggy in the 3 wire scenario since
-   // SR_EN_BIT is apparently not toggled on and off in 3 write mode.
+   // Note: it looks like the code is buggy and does not send a SR_EN_BIT
+   // low to high transition. However due to the peculiar wiring required by this
+   // code, toggling the SR _enable_pin low happens to also take the LCD enable bit
+   // low and therefore creates the low/high transition required by the LCD.
+   // Not obvious from reading the code, but it works :)
    val1 = SR_EN_BIT | ((value >> 1) & 0x78);
    shiftOut ( _srdata_pin, _srclock_pin, MSBFIRST, val1 );
    
