@@ -12,8 +12,14 @@
 // freetronics in the arduino miniconf as part of linux.conf.au 2012) and
 // therefore this code organizes the output data differently.
 //
-// Upstream source for this module is
+// Original source for this module is
 // https://github.com/marcmerlin/NewLiquidCrystal
+// Web page is:
+// http://marc.merlins.org/perso/arduino/post_2012-01-23_LiquidCrystal-driver-support-LCD3Wire-hardware-_pebble-and-others_.html
+// This code was since then included in
+// https://bitbucket.org/fmalpartida/new-liquidcrystal/wiki/Home
+// this last location should be considered the up to date location and contains
+// the 'FastIO' branch which makes this code 4 times faster.
 //
 // Thread Safe: No
 // Extendable: Yes
@@ -86,6 +92,10 @@
 // - The pinout used here is same saner (the 4 bits for the LCD are all in one 
 //   nibble of the shift register, not spread across 2 like in the
 //   LiquidCrystal_SR pinout)
+// Note however that LiquidCrystal_SR while a bit more complex wiring and code
+// wise, supports non latching shift registers and it a few percent faster than
+// this code since it can address the LCD enable pin without having to send 
+// a pulse through the shift register like the LCD3Wires setup requires.
 //  
 // This code makes sure to properly follow the specifications when talking
 // to the LCD while using minimal delays (it's faster than the LCD3wire and aiko
