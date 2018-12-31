@@ -14,6 +14,10 @@ LiquidDisplay library. This code was forked off Francisco's code:
 http://hg.bijland.net/fmalpartida/new-liquidcrystal
 https://bitbucket.org/fmalpartida/new-liquidcrystal/wiki/Home
 
+While this code supported I2C, I don't personally don't have it and I'm told
+it does not work (anymore?). Sorry, but I can't fix it for you, you should
+report such issues to Francisco at the links above.
+
 In turn, Raron used Francisco's code and made this shift register library:
 http://code.google.com/p/arduinoshiftreglcd/
 
